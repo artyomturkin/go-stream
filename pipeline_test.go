@@ -103,7 +103,7 @@ func TestPipeline_FailStep(t *testing.T) {
 	}
 
 	// create test streams
-	source := &TestStream{Messages: tmsgs, WaitForCancel: true}
+	source := &TestStream{Messages: tmsgs, BlockAfterAllMessagesRead: true}
 	output := &TestStream{PubResults: pubs}
 
 	// create pipeline
@@ -156,7 +156,7 @@ func TestPipeline_FailAck(t *testing.T) {
 		AckResults: map[*stream.Message]error{
 			msgs[5]: errorExpected,
 		},
-		WaitForCancel: true,
+		BlockAfterAllMessagesRead: true,
 	}
 	output := &TestStream{PubResults: pubs}
 
@@ -196,8 +196,8 @@ func TestPipeline_FailNack(t *testing.T) {
 
 	// create test streams
 	source := &TestStream{
-		Messages:      tmsgs,
-		WaitForCancel: true,
+		Messages:                  tmsgs,
+		BlockAfterAllMessagesRead: true,
 		AckResults: map[*stream.Message]error{
 			msgs[5]: errorExpected,
 		},
@@ -218,6 +218,46 @@ func TestPipeline_FailNack(t *testing.T) {
 	case err := <-p.Done():
 		if _, ok := err.(stream.ErrorNackMsg); !ok {
 			t.Errorf("got unexpected error: %v", err)
+		}
+	}
+}
+
+func TestPipeline_CancelContext(t *testing.T) {
+	// setup test data
+	msgs := []*stream.Message{}
+	pubs := map[*stream.Message]error{}
+	tmsgs := []TestMessage{}
+
+	for index := 0; index < 10; index++ {
+		msg := &stream.Message{
+			Source: "test",
+			Type:   "int",
+			ID:     strconv.Itoa(index),
+			Time:   time.Now(),
+			Data:   index,
+		}
+
+		pubs[msg] = nil
+		tmsgs = append(tmsgs, TestMessage{Message: msg, Error: nil})
+		msgs = append(msgs, msg)
+	}
+
+	// create test streams
+	source := &TestStream{Messages: tmsgs, BlockAfterAllMessagesRead: true}
+	output := &TestStream{PubResults: pubs}
+
+	// create pipeline and cancel it
+	ctx, cancel := context.WithCancel(context.TODO())
+	p := stream.NewPipeline("test").From(source).Do(forward).To(output).Build(ctx)
+	cancel()
+
+	// wait for timeout or completion
+	select {
+	case <-time.After(time.Second):
+		t.Fatalf("test timed out")
+	case err := <-p.Done():
+		if e, ok := err.(stream.ErrorReadingMessage); !ok || (ok && e.Internal() != ErrorStreamCanceled) {
+			t.Fatalf("got unexpected error: %v", err)
 		}
 	}
 }

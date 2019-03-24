@@ -14,7 +14,7 @@ type TestStream struct {
 	Messages          []TestMessage
 	PublishedMessages []*stream.Message
 
-	WaitForCancel bool
+	BlockAfterAllMessagesRead bool
 }
 
 var _ stream.Stream = &TestStream{}
@@ -83,8 +83,9 @@ func (t *testStreamConsumerProducer) Read(ctx context.Context) (*stream.Message,
 		return m.Message, m.Error
 	}
 
-	if t.provider.WaitForCancel {
+	if t.provider.BlockAfterAllMessagesRead {
 		<-ctx.Done()
+		return nil, ErrorStreamCanceled
 	}
 
 	return nil, ErrorNoNewMessages
@@ -105,6 +106,6 @@ func (t *testStreamConsumerProducer) Publish(_ context.Context, m *stream.Messag
 }
 
 var (
-	// ErrorNoNewMessages no more messages can be read from a stream
-	ErrorNoNewMessages = errors.New("no more messages in stream")
+	ErrorNoNewMessages  = errors.New("no more messages in stream")
+	ErrorStreamCanceled = errors.New("stream canceled")
 )
