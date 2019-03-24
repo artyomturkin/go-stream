@@ -24,7 +24,7 @@ type PipelineStep func(context.Context, *Message) (*Message, error)
 // PipelineBuilder used to configure and create pipeline
 type PipelineBuilder struct {
 	name   string
-	source Provider
+	source Stream
 	steps  []PipelineStep
 
 	maxErrors int
@@ -39,14 +39,14 @@ func (p *PipelineBuilder) MaxErrors(n int) *PipelineBuilder {
 }
 
 // From set a source stream
-func (p *PipelineBuilder) From(source Provider) *PipelineBuilder {
+func (p *PipelineBuilder) From(source Stream) *PipelineBuilder {
 	p.source = source
 	return p
 }
 
 // To set an output stream, should be the last step in a pipeline
-func (p *PipelineBuilder) To(pr Provider) *PipelineBuilder {
-	stream := pr.GetStreamFor(p.name)
+func (p *PipelineBuilder) To(pr Stream) *PipelineBuilder {
+	stream := pr.GetProducer(p.name)
 	p.steps = append(p.steps,
 		func(ctx context.Context, m *Message) (*Message, error) {
 			return nil, stream.Publish(ctx, m)
@@ -65,7 +65,7 @@ func (p *PipelineBuilder) Do(steps ...PipelineStep) *PipelineBuilder {
 func (p *PipelineBuilder) Build(ctx context.Context) *Pipeline {
 	pipe := &Pipeline{
 		name:      p.name,
-		source:    p.source.GetStreamFor(p.name),
+		source:    p.source.GetConsumer(p.name),
 		steps:     p.steps,
 		maxErrors: p.maxErrors,
 	}
@@ -81,7 +81,7 @@ type Pipeline struct {
 	wg *sync.WaitGroup
 
 	name   string
-	source Stream
+	source Consumer
 	steps  []PipelineStep
 
 	maxErrors int

@@ -55,8 +55,8 @@ func TestPipeline_Success(t *testing.T) {
 	}
 
 	// create test streams
-	source := &TestStreamProvider{Messages: tmsgs}
-	output := &TestStreamProvider{PubResults: pubs}
+	source := &TestStream{Messages: tmsgs}
+	output := &TestStream{PubResults: pubs}
 
 	// create pipeline
 	p := stream.NewPipeline("test").From(source).Do(forward).To(output).Build(context.TODO())
@@ -103,8 +103,8 @@ func TestPipeline_FailStep(t *testing.T) {
 	}
 
 	// create test streams
-	source := &TestStreamProvider{Messages: tmsgs, WaitForCancel: true}
-	output := &TestStreamProvider{PubResults: pubs}
+	source := &TestStream{Messages: tmsgs, WaitForCancel: true}
+	output := &TestStream{PubResults: pubs}
 
 	// create pipeline
 	p := stream.NewPipeline("test").
@@ -151,14 +151,14 @@ func TestPipeline_FailAck(t *testing.T) {
 	}
 
 	// create test streams
-	source := &TestStreamProvider{
+	source := &TestStream{
 		Messages: tmsgs,
 		AckResults: map[*stream.Message]error{
 			msgs[5]: errorExpected,
 		},
 		WaitForCancel: true,
 	}
-	output := &TestStreamProvider{PubResults: pubs}
+	output := &TestStream{PubResults: pubs}
 
 	// create pipeline
 	p := stream.NewPipeline("test").From(source).Do(forward).To(output).Build(context.TODO())
@@ -195,14 +195,14 @@ func TestPipeline_FailNack(t *testing.T) {
 	}
 
 	// create test streams
-	source := &TestStreamProvider{
+	source := &TestStream{
 		Messages:      tmsgs,
 		WaitForCancel: true,
 		AckResults: map[*stream.Message]error{
 			msgs[5]: errorExpected,
 		},
 	}
-	output := &TestStreamProvider{PubResults: pubs}
+	output := &TestStream{PubResults: pubs}
 
 	// create pipeline
 	p := stream.NewPipeline("test").

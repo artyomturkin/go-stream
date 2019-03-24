@@ -8,7 +8,7 @@ import (
 	stream "github.com/artyomturkin/go-stream"
 )
 
-type TestStreamProvider struct {
+type TestStream struct {
 	AckResults        map[*stream.Message]error
 	PubResults        map[*stream.Message]error
 	Messages          []TestMessage
@@ -17,10 +17,19 @@ type TestStreamProvider struct {
 	WaitForCancel bool
 }
 
-var _ stream.Provider = &TestStreamProvider{}
+var _ stream.Stream = &TestStream{}
 
-func (t *TestStreamProvider) GetStreamFor(_ string) stream.Stream {
-	return &TestStream{
+func (t *TestStream) GetConsumer(_ string) stream.Consumer {
+	return &testStreamConsumerProducer{
+		acks:     t.AckResults,
+		pubs:     t.PubResults,
+		msgs:     t.Messages,
+		provider: t,
+	}
+}
+
+func (t *TestStream) GetProducer(_ string) stream.Producer {
+	return &testStreamConsumerProducer{
 		acks:     t.AckResults,
 		pubs:     t.PubResults,
 		msgs:     t.Messages,
@@ -33,7 +42,7 @@ type TestMessage struct {
 	Error   error
 }
 
-type TestStream struct {
+type testStreamConsumerProducer struct {
 	sync.Mutex
 
 	acks map[*stream.Message]error
@@ -41,12 +50,12 @@ type TestStream struct {
 	pubs map[*stream.Message]error
 
 	pos      int
-	provider *TestStreamProvider
+	provider *TestStream
 }
 
-var _ stream.Stream = &TestStream{}
+var _ stream.Consumer = &testStreamConsumerProducer{}
 
-func (t *TestStream) Ack(_ context.Context, m *stream.Message) error {
+func (t *testStreamConsumerProducer) Ack(_ context.Context, m *stream.Message) error {
 	if err, ok := t.acks[m]; ok {
 		return err
 	}
@@ -55,7 +64,7 @@ func (t *TestStream) Ack(_ context.Context, m *stream.Message) error {
 	return nil
 }
 
-func (t *TestStream) Nack(_ context.Context, m *stream.Message) error {
+func (t *testStreamConsumerProducer) Nack(_ context.Context, m *stream.Message) error {
 	if err, ok := t.acks[m]; ok {
 		return err
 	}
@@ -64,7 +73,7 @@ func (t *TestStream) Nack(_ context.Context, m *stream.Message) error {
 	return nil
 }
 
-func (t *TestStream) Read(ctx context.Context) (*stream.Message, error) {
+func (t *testStreamConsumerProducer) Read(ctx context.Context) (*stream.Message, error) {
 	t.Lock()
 	defer t.Unlock()
 
@@ -81,7 +90,7 @@ func (t *TestStream) Read(ctx context.Context) (*stream.Message, error) {
 	return nil, ErrorNoNewMessages
 }
 
-func (t *TestStream) Publish(_ context.Context, m *stream.Message) error {
+func (t *testStreamConsumerProducer) Publish(_ context.Context, m *stream.Message) error {
 	t.Lock()
 	defer t.Unlock()
 

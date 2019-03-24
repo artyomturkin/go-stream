@@ -5,16 +5,21 @@ import (
 	"time"
 )
 
-// Provider used to build a Stream object
-type Provider interface {
-	GetStreamFor(group string) Stream
+// Stream used to build a Consumer object
+type Stream interface {
+	GetConsumer(group string) Consumer
+	GetProducer(group string) Producer
 }
 
-// Stream provides access to a single message stream
-type Stream interface {
+// Consumer provides read access to a message stream
+type Consumer interface {
 	Read(context.Context) (*Message, error)
 	Ack(context.Context, *Message) error
 	Nack(context.Context, *Message) error
+}
+
+// Producer provides publish access to a message stream
+type Producer interface {
 	Publish(context.Context, *Message) error
 }
 
