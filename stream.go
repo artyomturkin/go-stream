@@ -61,8 +61,12 @@ func NewErrorMessageFormat(internal error) ErrorMessageFormat {
 
 // Config common configuration for streams
 type Config struct {
+	Endpoints           []string
+	Topic               string
+	MaxInflightMessages int
+
+	WireConfig             *WireConfig
 	ForwardUnmarshalErrors bool
-	UnmarshalMessageConfig WireConfig
 }
 
 // WireConfig configuration for message unmarshaling
