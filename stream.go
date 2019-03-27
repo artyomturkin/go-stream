@@ -104,13 +104,15 @@ func UnmarshalMessage(data interface{}, c *WireConfig) (*Message, error) {
 		var t time.Time
 
 		vErr := ""
-		if s, ok := d[c.IDField].(string); !ok {
+		if s, ok := d[c.IDField]; !ok {
 			vErr = "failed to get ID;"
 		} else {
-			id = s
+			id = fmt.Sprintf("%v", s)
 		}
 
-		if s, ok := d[c.TimeField].(string); !ok {
+		if s, ok := d[c.TimeField].(time.Time); ok {
+			t = s
+		} else if s, ok := d[c.TimeField].(string); !ok {
 			vErr += "failed to get Time"
 		} else if ti, err := time.Parse(time.RFC3339, s); err != nil {
 			vErr += err.Error()
