@@ -18,6 +18,9 @@ type streamController struct {
 	topic              string
 }
 
+// Ensure that streamController implements stream.Stream interface
+var _ stream.Stream = (*streamController)(nil)
+
 func (s *streamController) GetConsumer(group string) stream.Consumer {
 	r := k.NewReader(k.ReaderConfig{
 		Brokers:       s.brokers,
@@ -35,7 +38,14 @@ func (s *streamController) GetConsumer(group string) stream.Consumer {
 }
 
 func (s *streamController) GetProducer(group string) stream.Producer {
-	return &producer{}
+	w := k.NewWriter(k.WriterConfig{
+		Brokers: s.brokers,
+		Topic:   s.topic,
+	})
+	return &producer{
+		w:  w,
+		uc: s.uc,
+	}
 }
 
 type consumer struct {
@@ -99,4 +109,8 @@ func (p *producer) Publish(ctx context.Context, m *stream.Message) error {
 	}
 
 	return p.w.WriteMessages(ctx, k.Message{Value: data})
+}
+
+func (p *producer) Close() error {
+	return p.w.Close()
 }
