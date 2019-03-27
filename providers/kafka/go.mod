@@ -3,7 +3,7 @@ module github.com/artyomturkin/go-stream/providers/kafka
 go 1.12
 
 require (
-	github.com/artyomturkin/go-stream v0.0.0-20190324163851-9558705a90f3
+	github.com/artyomturkin/go-stream v0.0.0-20190325121033-201d4e8c9833
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible // indirect
 	github.com/segmentio/kafka-go v0.2.2

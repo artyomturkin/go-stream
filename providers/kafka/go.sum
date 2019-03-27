@@ -1,5 +1,7 @@
 github.com/artyomturkin/go-stream v0.0.0-20190324163851-9558705a90f3 h1:M6osz/3urQKooCgp/5n4uzwgxy28SnzrFrsdK+rATkI=
 github.com/artyomturkin/go-stream v0.0.0-20190324163851-9558705a90f3/go.mod h1:MIRul201KNHI/jGx0lUM81sZeDVO+67qc69GESdwSd0=
+github.com/artyomturkin/go-stream v0.0.0-20190325121033-201d4e8c9833 h1:cJbyZj94sOUoTjy/qu0/JGWQ6TmJu6m2PCYhKDGc2gA=
+github.com/artyomturkin/go-stream v0.0.0-20190325121033-201d4e8c9833/go.mod h1:MIRul201KNHI/jGx0lUM81sZeDVO+67qc69GESdwSd0=
 github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=
 github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
