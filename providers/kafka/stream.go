@@ -18,6 +18,17 @@ type streamController struct {
 	topic              string
 }
 
+// New create new stream from config
+func New(c stream.Config) stream.Stream {
+	return &streamController{
+		s:                  semaphore.NewWeighted(int64(c.MaxInflightMessages)),
+		uc:                 c.WireConfig,
+		breakOnFormatError: c.ForwardUnmarshalErrors,
+		brokers:            c.Endpoints,
+		topic:              c.Topic,
+	}
+}
+
 // Ensure that streamController implements stream.Stream interface
 var _ stream.Stream = (*streamController)(nil)
 
