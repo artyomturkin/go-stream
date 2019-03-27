@@ -18,11 +18,13 @@ type Consumer interface {
 	Read(context.Context) (*Message, error)
 	Ack(context.Context, *Message) error
 	Nack(context.Context, *Message) error
+	Close() error
 }
 
 // Producer provides publish access to a message stream
 type Producer interface {
 	Publish(context.Context, *Message) error
+	Close() error
 }
 
 // Message stream message
