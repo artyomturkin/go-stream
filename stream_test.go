@@ -58,6 +58,10 @@ type testStreamConsumerProducer struct {
 
 var _ stream.Consumer = &testStreamConsumerProducer{}
 
+func (t *testStreamConsumerProducer) Close() error {
+	return nil
+}
+
 func (t *testStreamConsumerProducer) Ack(_ context.Context, m *stream.Message) error {
 	if err, ok := t.acks[m]; ok {
 		return err
@@ -124,7 +128,7 @@ func TestUnmarshalMessage_Raw_Success(t *testing.T) {
 	d, _ := json.Marshal(msg)
 
 	c := &stream.WireConfig{
-		UnmarshalF: json.Unmarshal,
+		UnmarshalF: stream.WrapUnmarshalFromBytes(json.Unmarshal),
 		IDField:    "id",
 		TimeField:  "time",
 		RawData:    true,
@@ -158,7 +162,7 @@ func TestUnmarshalMessage_Message_Success(t *testing.T) {
 	d, _ := json.Marshal(msg)
 
 	c := &stream.WireConfig{
-		UnmarshalF: json.Unmarshal,
+		UnmarshalF: stream.WrapUnmarshalFromBytes(json.Unmarshal),
 	}
 
 	m, err := stream.UnmarshalMessage(d, c)
@@ -179,7 +183,7 @@ func TestUnmarshalMessage_Raw_Fail(t *testing.T) {
 	d, _ := json.Marshal(msg)
 
 	c := &stream.WireConfig{
-		UnmarshalF: json.Unmarshal,
+		UnmarshalF: stream.WrapUnmarshalFromBytes(json.Unmarshal),
 		IDField:    "id",
 		TimeField:  "time",
 		RawData:    true,
@@ -212,7 +216,7 @@ func TestUnmarshalMessage_Message_Fail(t *testing.T) {
 	d, _ := json.Marshal(msg)
 
 	c := &stream.WireConfig{
-		UnmarshalF: json.Unmarshal,
+		UnmarshalF: stream.WrapUnmarshalFromBytes(json.Unmarshal),
 	}
 
 	_, err := stream.UnmarshalMessage(d, c)
@@ -240,7 +244,7 @@ func TestMarshal_Raw_Success(t *testing.T) {
 	}
 
 	wc := &stream.WireConfig{
-		MarshalF:    json.Marshal,
+		MarshalF:    stream.WrapMarshalIntoBytes(json.Marshal),
 		ContentType: "application/json",
 		RawData:     true,
 	}
@@ -248,7 +252,7 @@ func TestMarshal_Raw_Success(t *testing.T) {
 	d, _ := stream.MarshalMessage(m, wc)
 
 	var r map[string]interface{}
-	json.Unmarshal(d, &r)
+	json.Unmarshal(d.([]byte), &r)
 
 	if r["msg"] != "hello world" {
 		t.Errorf("unexpected msg: %v", r)
@@ -270,14 +274,14 @@ func TestMarshal_Message_Success(t *testing.T) {
 	}
 
 	wc := &stream.WireConfig{
-		MarshalF:    json.Marshal,
+		MarshalF:    stream.WrapMarshalIntoBytes(json.Marshal),
 		ContentType: "application/json",
 	}
 
 	d, _ := stream.MarshalMessage(m, wc)
 
 	var r map[string]interface{}
-	json.Unmarshal(d, &r)
+	json.Unmarshal(d.([]byte), &r)
 
 	if r["id"] != "identity" {
 		t.Errorf("unexpected msg: %v", r)

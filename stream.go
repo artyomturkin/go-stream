@@ -73,8 +73,8 @@ type Config struct {
 
 // WireConfig configuration for message unmarshaling
 type WireConfig struct {
-	UnmarshalF  func([]byte, interface{}) error
-	MarshalF    func(interface{}) ([]byte, error)
+	UnmarshalF  func(interface{}, interface{}) error
+	MarshalF    func(interface{}) (interface{}, error)
 	RawData     bool
 	ContentType string
 
@@ -85,7 +85,7 @@ type WireConfig struct {
 }
 
 // UnmarshalMessage convert byte array to message, extracting headers if needed
-func UnmarshalMessage(data []byte, c *WireConfig) (*Message, error) {
+func UnmarshalMessage(data interface{}, c *WireConfig) (*Message, error) {
 	var msg Message
 
 	if !c.RawData {
@@ -139,7 +139,7 @@ func UnmarshalMessage(data []byte, c *WireConfig) (*Message, error) {
 }
 
 // MarshalMessage Convert message to bytes
-func MarshalMessage(m *Message, wc *WireConfig) ([]byte, error) {
+func MarshalMessage(m *Message, wc *WireConfig) (interface{}, error) {
 	var d interface{}
 	if wc.RawData {
 		d = m.Data
