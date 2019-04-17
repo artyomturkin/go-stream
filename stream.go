@@ -2,8 +2,6 @@ package stream
 
 import (
 	"context"
-
-	"github.com/hashicorp/go-hclog"
 )
 
 // Stream used to build a Consumer object
@@ -37,8 +35,6 @@ type Config struct {
 	Endpoints           []string
 	Topic               string
 	MaxInflightMessages int
-
-	Logger hclog.Logger
 }
 
 type streamContextKey string

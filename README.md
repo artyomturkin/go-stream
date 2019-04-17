@@ -1,6 +1,6 @@
-# Stream processing for Go
+# Stream abstraction for Go
 
-Common stream abstraction and implementations for stream providers.
+Common stream abstraction and in-memory implementation for streaming data.
 
 Importing into a project
 ```sh
@@ -9,65 +9,40 @@ go get guthub.com/artyomturkin/go-stream
 
 ## Abstractions
 
-### Streams
+### Stream
 Common structure and configuration for creating streams from providers, consumer and producer interfaces and message structure.
 
 ```go
 // Stream used to build a Consumer object
 type Stream interface {
-	GetConsumer(group string) Consumer
-	GetProducer(group string) Producer
+	GetConsumer(ctx context.Context, group string) Consumer
+	GetProducer(ctx context.Context, group string) Producer
+}
+
+// Message wraps context and data from stream
+type Message struct {
+	Context context.Context
+	Data    interface{}
 }
 
 // Consumer provides read access to a message stream
 type Consumer interface {
-	Read(context.Context) (*Message, error)
-	Ack(context.Context, *Message) error
-	Nack(context.Context, *Message) error
+	Messages() <-chan Message
+	Ack(context.Context) error
+	Nack(context.Context) error
 	Close() error
 }
 
 // Producer provides publish access to a message stream
 type Producer interface {
-	Publish(context.Context, *Message) error
+	Publish(context.Context, interface{}) error
 	Close() error
 }
 
-// Message stream message
-type Message struct {
-	ID          string      `json:"id"`
-	Type        string      `json:"type"`
-	Time        time.Time   `json:"time"`
-	Source      string      `json:"source"`
-	Data        interface{} `json:"data"`
-	ContentType string      `json:"contenttype"`
-
-	StreamMeta interface{} `json:"-"`
+// Config common configuration for streams
+type Config struct {
+	Endpoints           []string
+	Topic               string
+	MaxInflightMessages int
 }
-```
-
-### Pipelines
-
-Stream processing abstractions. Pipeline consists of one input stream, functions to modify and/or filter messages and one output stream? if any.
-
-Example:
-```go
-// create pipeline
-p := stream.NewPipeline("pipeline-name").From(source).Do(forward, forward).Do(forward).To(output).Build(ctx)
-```
-
-To drop message in a filter, filter func should return nil instead of message.
-
-## Providers
-
-### Kafka
-
-Importing 
-```sh
-go get github.com/artyomturkin/go-stream/providers/kafka
-```
-
-Create a new stream:
-```go
-stream := kafka.New(config)
 ```
