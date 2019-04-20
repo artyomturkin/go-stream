@@ -9,7 +9,7 @@ go get github.com/artyomturkin/go-stream
 
 Import into a project with `go mod` support by adding to `go.mod` file
 ```
-require github.com/artyomturkin/go-stream v1.0.0
+require github.com/artyomturkin/go-stream v1.1.0
 ```
 
 ## Abstractions
@@ -39,6 +39,7 @@ type Consumer interface {
 	Nack(context.Context) error
 	Close() error
 	Errors() <-chan error
+	Done() <-chan struct{}
 }
 ```
 ```go
@@ -47,6 +48,7 @@ type Producer interface {
 	Publish(context.Context, interface{}) error
 	Close() error
 	Errors() <-chan error
+	Done() <-chan struct{}
 }
 ```
 ```go

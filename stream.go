@@ -23,6 +23,7 @@ type Consumer interface {
 	Nack(context.Context) error
 	Close() error
 	Errors() <-chan error
+	Done() <-chan struct{}
 }
 
 // Producer provides publish access to a message stream
@@ -30,6 +31,7 @@ type Producer interface {
 	Publish(context.Context, interface{}) error
 	Close() error
 	Errors() <-chan error
+	Done() <-chan struct{}
 }
 
 // Config common configuration for streams

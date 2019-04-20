@@ -39,8 +39,9 @@ func (i InmemStream) GetProducer(ctx context.Context, _ string) Producer {
 type consumerProducer struct {
 	sync.Mutex
 
-	is  InmemStream
-	ctx context.Context
+	is   InmemStream
+	ctx  context.Context
+	done chan struct{}
 }
 
 var _ Consumer = &consumerProducer{}
@@ -73,6 +74,7 @@ func (t *consumerProducer) Messages() <-chan Message {
 			ch <- Message{Data: m, Context: SetTrackers(t.ctx, i)}
 		}
 		close(ch)
+		close(t.done)
 	}()
 	return ch
 }
@@ -87,4 +89,8 @@ func (t *consumerProducer) Publish(_ context.Context, m interface{}) error {
 
 func (t *consumerProducer) Errors() <-chan error {
 	return make(chan error)
+}
+
+func (t *consumerProducer) Done() <-chan struct{} {
+	return t.done
 }
