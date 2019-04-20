@@ -35,6 +35,30 @@ type Config struct {
 	Endpoints           []string
 	Topic               string
 	MaxInflightMessages int
+
+	Custom interface{}
+}
+
+// TrackedMessagesContextKey context key to get tracked messages from context. Tracked messages are stored in []interface{}
+const TrackedMessagesContextKey = streamContextKey("TRACKED_MESSAGES")
+
+// SetTrackers adds message trackers to context
+func SetTrackers(ctx context.Context, tracker ...interface{}) context.Context {
+	tracks := GetTrackers(ctx)
+
+	for _, t := range tracker {
+		tracks = append(tracks, t)
+	}
+
+	return context.WithValue(ctx, TrackedMessagesContextKey, tracks)
+}
+
+// GetTrackers returns an array of trackers
+func GetTrackers(ctx context.Context) []interface{} {
+	if a, ok := ctx.Value(TrackedMessagesContextKey).([]interface{}); ok {
+		return a
+	}
+	return []interface{}{}
 }
 
 type streamContextKey string

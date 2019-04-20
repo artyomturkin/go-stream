@@ -34,9 +34,6 @@ func (i InmemStream) GetProducer(ctx context.Context, _ string) Producer {
 	}
 }
 
-// InmemMessagePosition message number in stream identifier for context value
-const InmemMessagePosition = streamContextKey("InmemMessagePosition")
-
 /////////////   Internal implementation   /////////////
 
 type consumerProducer struct {
@@ -73,7 +70,7 @@ func (t *consumerProducer) Messages() <-chan Message {
 	ch := make(chan Message)
 	go func() {
 		for i, m := range t.is.Messages {
-			ch <- Message{Data: m, Context: context.WithValue(t.ctx, InmemMessagePosition, i)}
+			ch <- Message{Data: m, Context: SetTrackers(t.ctx, i)}
 		}
 		close(ch)
 	}()
