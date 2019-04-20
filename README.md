@@ -56,7 +56,8 @@ Functions to set and get tracking information from context
 ```go
 // SetTrackers adds message trackers to context
 func SetTrackers(ctx context.Context, tracker ...interface{}) context.Context
-
+```
+```go
 // GetTrackers returns an array of trackers
 func GetTrackers(ctx context.Context) []interface{}
 ```
