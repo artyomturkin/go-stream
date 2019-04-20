@@ -84,3 +84,7 @@ func (t *consumerProducer) Publish(_ context.Context, m interface{}) error {
 	t.is.Messages = append(t.is.Messages, m)
 	return nil
 }
+
+func (t *consumerProducer) Errors() <-chan error {
+	return make(chan error)
+}
