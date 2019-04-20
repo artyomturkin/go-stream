@@ -31,12 +31,14 @@ type Consumer interface {
 	Ack(context.Context) error
 	Nack(context.Context) error
 	Close() error
+	Errors() <-chan error
 }
 
 // Producer provides publish access to a message stream
 type Producer interface {
 	Publish(context.Context, interface{}) error
 	Close() error
+	Errors() <-chan error
 }
 
 // Config common configuration for streams
