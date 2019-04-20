@@ -2,9 +2,14 @@
 
 Common stream abstraction and in-memory implementation for streaming data.
 
-Importing into a project
+Importing into a project with `go get`
 ```sh
-go get guthub.com/artyomturkin/go-stream
+go get github.com/artyomturkin/go-stream
+```
+
+Import into a project with `go mod` support by adding to `go.mod` file
+```
+require github.com/artyomturkin/go-stream v1.0.0
 ```
 
 ## Abstractions
