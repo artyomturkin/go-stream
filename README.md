@@ -18,13 +18,15 @@ type Stream interface {
 	GetConsumer(ctx context.Context, group string) Consumer
 	GetProducer(ctx context.Context, group string) Producer
 }
-
+```
+```go
 // Message wraps context and data from stream
 type Message struct {
 	Context context.Context
 	Data    interface{}
 }
-
+```
+```go
 // Consumer provides read access to a message stream
 type Consumer interface {
 	Messages() <-chan Message
@@ -33,14 +35,16 @@ type Consumer interface {
 	Close() error
 	Errors() <-chan error
 }
-
+```
+```go
 // Producer provides publish access to a message stream
 type Producer interface {
 	Publish(context.Context, interface{}) error
 	Close() error
 	Errors() <-chan error
 }
-
+```
+```go
 // Config common configuration for streams
 type Config struct {
 	Endpoints           []string
