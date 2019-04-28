@@ -9,7 +9,7 @@ go get github.com/artyomturkin/go-stream
 
 Import into a project with `go mod` support by adding to `go.mod` file
 ```
-require github.com/artyomturkin/go-stream v1.1.1
+require github.com/artyomturkin/go-stream v1.1.2
 ```
 
 ## Abstractions

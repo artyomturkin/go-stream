@@ -6,7 +6,7 @@ import (
 )
 
 // Ensure that InmemStream implements Stream interface
-var _ Stream = InmemStream{}
+var _ Stream = &InmemStream{}
 
 // InmemStream create inmemory stream.
 // Created consumer will output elements defined in Message, Acks and Nacks will be stored in Acks and Nacks fields.
@@ -19,7 +19,7 @@ type InmemStream struct {
 }
 
 // GetConsumer create new consumer from inmemory stream
-func (i InmemStream) GetConsumer(ctx context.Context, _ string) Consumer {
+func (i *InmemStream) GetConsumer(ctx context.Context, _ string) Consumer {
 	return &consumerProducer{
 		is:   i,
 		ctx:  ctx,
@@ -28,7 +28,7 @@ func (i InmemStream) GetConsumer(ctx context.Context, _ string) Consumer {
 }
 
 // GetProducer create new producer from inmemory stream
-func (i InmemStream) GetProducer(ctx context.Context, _ string) Producer {
+func (i *InmemStream) GetProducer(ctx context.Context, _ string) Producer {
 	return &consumerProducer{
 		is:   i,
 		ctx:  ctx,
@@ -41,7 +41,7 @@ func (i InmemStream) GetProducer(ctx context.Context, _ string) Producer {
 type consumerProducer struct {
 	sync.Mutex
 
-	is   InmemStream
+	is   *InmemStream
 	ctx  context.Context
 	done chan struct{}
 }
