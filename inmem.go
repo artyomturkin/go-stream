@@ -21,16 +21,18 @@ type InmemStream struct {
 // GetConsumer create new consumer from inmemory stream
 func (i InmemStream) GetConsumer(ctx context.Context, _ string) Consumer {
 	return &consumerProducer{
-		is:  i,
-		ctx: ctx,
+		is:   i,
+		ctx:  ctx,
+		done: make(chan struct{}),
 	}
 }
 
 // GetProducer create new producer from inmemory stream
 func (i InmemStream) GetProducer(ctx context.Context, _ string) Producer {
 	return &consumerProducer{
-		is:  i,
-		ctx: ctx,
+		is:   i,
+		ctx:  ctx,
+		done: make(chan struct{}),
 	}
 }
 
